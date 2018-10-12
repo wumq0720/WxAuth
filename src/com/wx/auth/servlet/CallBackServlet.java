@@ -9,17 +9,16 @@ import java.sql.SQLException;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONObject;
-
 import com.wx.auth.util.AuthUtil;
 
-@WebServlet("/wxCallBack")
-public class CallBackServlet extends HttpServlet{
+import net.sf.json.JSONObject;
+
+//@WebServlet("/wxCallBack")
+public class CallBackServlet extends HttpServlet {
 	private String dbUrl;
 	private String driverName;
 	private String userName;
@@ -27,7 +26,7 @@ public class CallBackServlet extends HttpServlet{
 	private Connection conn = null;
 	private PreparedStatement ps = null;
 	private ResultSet rs = null;
-	
+
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		try {
@@ -41,39 +40,35 @@ public class CallBackServlet extends HttpServlet{
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String code = req.getParameter("code");
-		String url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=" + AuthUtil.APPID
-				+ "&secret=" + AuthUtil.APPSECRET
-				+ "&code=" + code
-				+ "&grant_type=authorization_code";
+		String url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=" + AuthUtil.APPID + "&secret="
+				+ AuthUtil.APPSECRET + "&code=" + code + "&grant_type=authorization_code";
 		JSONObject jsonObject = AuthUtil.doGetJson(url);
 		String openid = jsonObject.getString("openid");
 		String token = jsonObject.getString("access_token");
-		String infoUrl = "https://api.weixin.qq.com/sns/userinfo?access_token=" + token
-				+ "&openid=" + openid
+		String infoUrl = "https://api.weixin.qq.com/sns/userinfo?access_token=" + token + "&openid=" + openid
 				+ "&lang=zh_CN";
 		JSONObject userInfo = AuthUtil.doGetJson(infoUrl);
 		System.out.println(userInfo);
-		String unionid = userInfo.getString("unionid");
-		
-		//1、使用微信用户信息直接登录，无需注册和绑定
-		//req.setAttribute("info", userInfo);
-		//req.getRequestDispatcher("/index1.jsp").forward(req, resp);
-		
-		//2、将微信与当前系统的账号进行绑定
+		// String unionid = userInfo.getString("unionid");
+
+		// 1、使用微信用户信息直接登录，无需注册和绑定
+		// req.setAttribute("info", userInfo);
+		// req.getRequestDispatcher("/index1.jsp").forward(req, resp);
+
+		// 2、将微信与当前系统的账号进行绑定
 		try {
-			String nickName = getNickName(unionid);
-			if(!"".equals(nickName)){
-				//绑定成功
+			String nickName = getNickName(openid);
+			if (!"".equals(nickName)) {
+				// 绑定成功
 				req.setAttribute("nickName", nickName);
 				req.getRequestDispatcher("/index2.jsp").forward(req, resp);
-			}else{
-				//未绑定
-				req.setAttribute("unionid", unionid);
+			} else {
+				// 未绑定
+				req.setAttribute("openid", openid);
 				req.getRequestDispatcher("/login.jsp").forward(req, resp);
 			}
 		} catch (SQLException e) {
@@ -81,15 +76,15 @@ public class CallBackServlet extends HttpServlet{
 			e.printStackTrace();
 		}
 	}
-	
-	public String getNickName(String unionid) throws SQLException{
+
+	public String getNickName(String openid) throws SQLException {
 		String nickName = "";
 		conn = DriverManager.getConnection(dbUrl, userName, passWord);
-		String sql = "select nickname from user where unionid=?";
+		String sql = "select nickname from user where openid=?";
 		ps = conn.prepareStatement(sql);
-		ps.setString(1, unionid);
+		ps.setString(1, openid);
 		rs = ps.executeQuery();
-		while(rs.next()){
+		while (rs.next()) {
 			nickName = rs.getString("NICKNAME");
 		}
 		rs.close();
@@ -97,39 +92,38 @@ public class CallBackServlet extends HttpServlet{
 		conn.close();
 		return nickName;
 	}
-	
-	public int updUser(String unionid,String account,String password) throws SQLException{
+
+	public int updUser(String openid, String account, String password) throws SQLException {
 		conn = DriverManager.getConnection(dbUrl, userName, passWord);
-		String sql = "update user set unionid=? where account=? and password=?";
+		String sql = "update user set openid=? where account=? and password=?";
 		ps = conn.prepareStatement(sql);
-		ps.setString(1, unionid);
+		ps.setString(1, openid);
 		ps.setString(2, account);
 		ps.setString(3, password);
 		int temp = ps.executeUpdate();
-		
+
 		rs.close();
 		ps.close();
 		conn.close();
 		return temp;
 	}
-	
+
 	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String account = req.getParameter("account");
 		String password = req.getParameter("password");
-		String unionid = req.getParameter("unionid");
+		String openid = req.getParameter("openid");
 		try {
-			int temp = updUser(unionid, account, password);
-			if(temp>0){
+			int temp = updUser(openid, account, password);
+			if (temp > 0) {
 				System.out.println("账号绑定成功");
-			}else{
+			} else {
 				System.out.println("账号绑定失败");
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 }

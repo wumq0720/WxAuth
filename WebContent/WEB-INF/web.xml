@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" metadata-complete="true" version="3.1">
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+	metadata-complete="false" version="3.1">
 	<display-name>WxAuth</display-name>
 	<welcome-file-list>
-    	<welcome-file>index.jsp</welcome-file>
-  	</welcome-file-list>
-  	
-  	<servlet>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+	
+	<servlet>
   		<servlet-name>wxCallBack</servlet-name>
   		<servlet-class>com.wx.auth.servlet.CallBackServlet</servlet-class>
   		<init-param>
   			<param-name>dbUrl</param-name>
-  			<param-value>jdbc:mysql://127.0.0.1:3306/auth</param-value>
+  			<param-value>jdbc:mysql://127.0.0.1:3306/auth?useSSL=false</param-value>
   		</init-param>
   		<init-param>
   			<param-name>driverName</param-name>
@@ -22,7 +25,7 @@
   		</init-param>
   		<init-param>
   			<param-name>passWord</param-name>
-  			<param-value>root</param-value>
+  			<param-value>123456</param-value>
   		</init-param>
   		<load-on-startup>1</load-on-startup>
   	</servlet>
@@ -32,13 +35,12 @@
   		<url-pattern>/wxCallBack</url-pattern>
   	</servlet-mapping>
   	
-  	
   	<servlet>
   		<servlet-name>pcCallBack</servlet-name>
   		<servlet-class>com.pc.auth.servlet.CallBackServlet</servlet-class>
   		<init-param>
   			<param-name>dbUrl</param-name>
-  			<param-value>jdbc:mysql://127.0.0.1:3306/auth</param-value>
+  			<param-value>jdbc:mysql://127.0.0.1:3306/auth?useSSL=false</param-value>
   		</init-param>
   		<init-param>
   			<param-name>driverName</param-name>
@@ -50,7 +52,7 @@
   		</init-param>
   		<init-param>
   			<param-name>passWord</param-name>
-  			<param-value>root</param-value>
+  			<param-value>123456</param-value>
   		</init-param>
   		<load-on-startup>1</load-on-startup>
   	</servlet>

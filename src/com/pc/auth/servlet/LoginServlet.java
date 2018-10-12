@@ -16,9 +16,9 @@ public class LoginServlet extends HttpServlet{
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		String backUrl = "http://brucebsc.eicp.net/WxAuth/pcCallBack";
-		String url = "https://open.weixin.qq.com/connect/qrconnect?appid="+AuthUtil.APPID
-				+ "&redirect_uri="+URLEncoder.encode(backUrl)
+		String backUrl = "http://x7ndnw.natappfree.cc/WxAuth/pcCallBack";
+		String url = "https://open.weixin.qq.com/connect/qrconnect?appid=" + AuthUtil.APPID
+				+ "&redirect_uri=" + URLEncoder.encode(backUrl)
 				+ "&response_type=code"
 				+ "&scope=snsapi_login"
 				+ "&state=STATE#wechat_redirect";
